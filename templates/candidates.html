@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | Applicants for {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('jobs') }}" style="color: var(--brand-teal); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem;">
+            <i class="ri-arrow-left-line"></i> Back to Jobs
+        </a>
+        <h1 class="page-title">{{ job.title }}</h1>
+        <p class="page-subtitle">{{ job.department }} • Target Skills: {{ job.required_skills }}</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('export_csv', job_id=job.id) }}" class="btn-ghost">
+            <i class="ri-download-2-line"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Bar for Role -->
+<div class="bento-grid">
+    <div class="glass-panel stat-card">
+        <span class="stat-label">Total Applicants</span>
+        <div class="stat-value">{{ total_cand }}</div>
+        <div class="stat-delta neutral"><i class="ri-user-3-line"></i> Total pool</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <span class="stat-label">Shortlisted</span>
+        <div class="stat-value" style="color: var(--status-success);">{{ shortlisted }}</div>
+        <div class="stat-delta up"><i class="ri-check-line"></i> Advanced</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <span class="stat-label">Mean Match Score</span>
+        <div class="stat-value" style="color: var(--brand-teal);">{{ avg_score }}%</div>
+        <div class="stat-delta neutral"><i class="ri-compass-3-line"></i> HMS Average</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <span class="stat-label">Rejected</span>
+        <div class="stat-value" style="color: var(--status-danger);">{{ rejected }}</div>
+        <div class="stat-delta neutral"><i class="ri-close-line"></i> Below threshold</div>
+    </div>
+</div>
+
+<!-- Drag & Drop Uploader -->
+<div class="glass-panel" style="margin-bottom: 2rem;">
+    <form method="POST" enctype="multipart/form-data" id="resumeUploadForm" action="{{ url_for('candidates', job_id=job.id) }}">
+        <div class="upload-dropzone" id="dropzoneBox">
+            <i class="ri-file-pdf-2-line upload-icon"></i>
+            <h3 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 0.35rem;">
+                Drop Candidate Resume (PDF) Here
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+                Layout-aware parser will extract text, contact info, and calculate Hybrid Match Score (HMS)
+            </p>
+            <input type="file" name="resume" id="resumeInput" accept=".pdf" style="display: none;" onchange="this.form.submit()">
+            <button type="button" class="btn-prime" onclick="document.getElementById('resumeInput').click()">
+                <i class="ri-upload-cloud-line"></i> Browse PDF Resume
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Candidate Ranking Table -->
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600;">
+            Ranked Applicant Roster
+        </h2>
+        <input type="text" id="tableSearchInput" placeholder="Search applicant, skills..." class="form-control" style="width: 260px; padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+    </div>
+
+    {% if candidates %}
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Applicant</th>
+                    <th>Match Score (HMS)</th>
+                    <th>Skill Overlap</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cand in candidates %}
+                <tr>
+                    <td style="font-family: var(--font-heading); font-weight: 700; color: var(--accent-cyan);">
+                        #{{ loop.index }}
+                    </td>
+                    <td>
+                        <strong style="color: var(--text-main); display: block;">{{ cand.name }}</strong>
+                        <span style="color: var(--text-muted); font-size: 0.82rem;">{{ cand.email or 'Email not detected' }}</span>
+                    </td>
+                    <td>
+                        <div class="score-pill">
+                            <span style="{% if cand.match_score >= 70 %}color: var(--status-success);{% elif cand.match_score >= 45 %}color: var(--status-warning);{% else %}color: var(--status-danger);{% endif %}">
+                                {{ cand.match_score }}%
+                            </span>
+                            <div class="pill-bar">
+                                <div class="pill-bar-fill" style="width: {{ cand.match_score }}%; {% if cand.match_score < 45 %}background: var(--status-danger);{% elif cand.match_score < 70 %}background: var(--status-warning);{% endif %}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="skill-tags">
+                            {% for s in cand.matched_skills.split(',')[:3] %}
+                                {% if s.strip() %}
+                                    <span class="skill-tag matched"><i class="ri-check-line"></i> {{ s.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                            {% for s in cand.missing_skills.split(',')[:2] %}
+                                {% if s.strip() %}
+                                    <span class="skill-tag missing"><i class="ri-close-line"></i> {{ s.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge {% if cand.status == 'Shortlisted' %}badge-high{% elif cand.status == 'Rejected' %}badge-low{% else %}badge-med{% endif %}">
+                            {{ cand.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem; align-items: center;">
+                            <a href="{{ url_for('candidate_detail', candidate_id=cand.id) }}" class="btn-ghost" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="View Comprehensive Dossier">
+                                <i class="ri-file-list-3-line"></i> Dossier
+                            </a>
+                            <a href="{{ url_for('update_status', candidate_id=cand.id, new_status='Shortlisted') }}" class="btn-ghost" style="padding: 0.35rem 0.55rem; color: var(--status-success);" title="Shortlist">
+                                <i class="ri-check-line"></i>
+                            </a>
+                            <a href="{{ url_for('update_status', candidate_id=cand.id, new_status='Rejected') }}" class="btn-ghost" style="padding: 0.35rem 0.55rem; color: var(--status-danger);" title="Reject">
+                                <i class="ri-close-line"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem 1rem;">
+        <i class="ri-inbox-line" style="font-size: 3rem; color: var(--text-faint); margin-bottom: 0.75rem; display: block;"></i>
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 0.5rem;">No Resumes Evaluated Yet</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Upload a candidate PDF resume above to see the real-time AI scoring and skill breakdown.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const dropzone = document.getElementById('dropzoneBox');
+    const input = document.getElementById('resumeInput');
+
+    if (dropzone && input) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('drag-over');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                input.files = files;
+                document.getElementById('resumeUploadForm').submit();
+            }
+        });
+    }
+</script>
+{% endblock %}

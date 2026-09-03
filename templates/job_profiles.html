@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | Job Profile Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Job Profiles</h1>
+        <p class="page-subtitle">Configure technical role requirements with automatic skill entity extraction</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 2rem;">
+    <!-- Create Job Form -->
+    <div class="glass-panel">
+        <h2 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; margin-bottom: 1.25rem;">
+            <i class="ri-edit-circle-line" style="color: var(--accent-cyan);"></i> Define New Role
+        </h2>
+
+        <form method="POST" action="{{ url_for('jobs') }}">
+            <div class="form-group">
+                <label class="form-label" for="title">Job Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Senior Machine Learning Engineer" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="department">Department</label>
+                    <input type="text" id="department" name="department" class="form-control" value="Engineering" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="experience_level">Seniority</label>
+                    <select id="experience_level" name="experience_level" class="form-control">
+                        <option value="Entry-Level">Entry-Level</option>
+                        <option value="Mid-Level" selected>Mid-Level</option>
+                        <option value="Senior">Senior</option>
+                        <option value="Lead / Staff">Lead / Staff</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Job Description (JD)</label>
+                <textarea id="description" name="description" class="form-control" style="min-height: 160px;" placeholder="Paste job scope, tech stack, and key responsibilities. Skills will be automatically mined using ContextHire NLP..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="manual_skills">Mandatory Skills Override (Optional, comma-separated)</label>
+                <input type="text" id="manual_skills" name="manual_skills" class="form-control" placeholder="python, pytorch, docker, aws, nlp">
+                <small style="color: var(--text-faint); font-size: 0.78rem;">Leave blank to let NLP automatically extract skills from Description.</small>
+            </div>
+
+            <button type="submit" class="btn-prime" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                <i class="ri-magic-line"></i> Create Profile & Auto-Extract Skills
+            </button>
+        </form>
+    </div>
+
+    <!-- Existing Job Profiles List -->
+    <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600;">
+                Existing Positions ({{ jobs|length }})
+            </h2>
+            <input type="text" id="tableSearchInput" placeholder="Filter..." class="form-control" style="width: 180px; padding: 0.4rem 0.75rem; font-size: 0.82rem;">
+        </div>
+
+        {% if jobs %}
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Extracted Skills</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td>
+                            <strong style="color: var(--text-main); display: block;">{{ job.title }}</strong>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">{{ job.department }} • {{ job.experience_level }}</span>
+                        </td>
+                        <td>
+                            <div class="skill-tags">
+                                {% for s in job.required_skills.split(',')[:5] %}
+                                    {% if s.strip() %}
+                                        <span class="skill-tag">{{ s.strip() }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if job.required_skills.split(',')|length > 5 %}
+                                    <span class="skill-tag">+{{ job.required_skills.split(',')|length - 5 }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a href="{{ url_for('candidates', job_id=job.id) }}" class="btn-prime" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                    <i class="ri-user-search-line"></i> Resumes
+                                </a>
+                                <a href="{{ url_for('delete_job', job_id=job.id) }}" onclick="return confirm('Delete this job profile and all candidate records?')" class="btn-ghost" style="padding: 0.4rem 0.6rem; color: var(--status-danger);">
+                                    <i class="ri-delete-bin-line"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem 1rem;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">No roles configured yet. Fill the form to create your first profile.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

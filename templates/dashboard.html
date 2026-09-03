@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | Hiring Intelligence Dashboard{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Good morning, {{ session.get('username', 'Recruiter') }}</h1>
+        <p class="page-subtitle">Here's an overview of your hiring activity and candidate pipelines.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('jobs') }}" class="btn-prime">
+            <i class="ri-add-line"></i> Create Job Position
+        </a>
+    </div>
+</div>
+
+<!-- Top Statistics Row (4 Cards) -->
+<div class="bento-grid">
+    <div class="stat-card">
+        <span class="stat-label">Active Jobs</span>
+        <div class="stat-value">{{ jobs|length }}</div>
+        <div class="stat-delta neutral"><i class="ri-briefcase-4-line"></i> Positions configured</div>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Total Candidates</span>
+        <div class="stat-value">{{ total_cand }}</div>
+        <div class="stat-delta up"><i class="ri-user-add-line"></i> Ingested resumes</div>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Candidates Analyzed</span>
+        <div class="stat-value">{{ total_cand }}</div>
+        <div class="stat-delta up" style="color: var(--brand-teal);"><i class="ri-check-line"></i> {{ shortlisted }} Shortlisted</div>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Average Match Score</span>
+        <div class="stat-value" style="color: var(--brand-teal);">{{ avg_score }}%</div>
+        <div class="stat-delta neutral"><i class="ri-scales-line"></i> Semantic alignment</div>
+    </div>
+</div>
+
+<!-- Analytics & Pipeline Section -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Score Distribution Chart -->
+    <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div>
+                <h2 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.2rem;">Candidate Match Score Distribution</h2>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Candidate density across evaluation tiers</div>
+            </div>
+            <span class="badge badge-high"><i class="ri-shield-check-line"></i> SBERT + TF-IDF</span>
+        </div>
+        <div style="height: 240px; position: relative;">
+            <canvas id="scoreDistributionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Screening Health & Quick Actions -->
+    <div class="glass-panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h2 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.35rem;">Screening Health</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem;">Pipeline conversion telemetry</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.35rem;">
+                        <span style="color: var(--text-secondary);">Shortlist Ratio</span>
+                        <strong style="color: var(--status-success);">
+                            {% if total_cand > 0 %}{{ ((shortlisted / total_cand) * 100)|round(1) }}%{% else %}0%{% endif %}
+                        </strong>
+                    </div>
+                    <div class="pill-bar">
+                        <div class="pill-bar-fill" style="width: {% if total_cand > 0 %}{{ (shortlisted / total_cand) * 100 }}%{% else %}0%{% endif %}; background: var(--status-success);"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.35rem;">
+                        <span style="color: var(--text-secondary);">Rejection Filter Rate</span>
+                        <strong style="color: var(--status-danger);">
+                            {% if total_cand > 0 %}{{ ((rejected / total_cand) * 100)|round(1) }}%{% else %}0%{% endif %}
+                        </strong>
+                    </div>
+                    <div class="pill-bar">
+                        <div class="pill-bar-fill" style="width: {% if total_cand > 0 %}{{ (rejected / total_cand) * 100 }}%{% else %}0%{% endif %}; background: var(--status-danger);"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.35rem;">
+                        <span style="color: var(--text-secondary);">Individual ATS Engine</span>
+                        <strong style="color: var(--brand-teal);">Active</strong>
+                    </div>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Candidates can evaluate resumes via ATS Checker.</p>
+                </div>
+            </div>
+        </div>
+        
+        <a href="{{ url_for('jobs') }}" class="btn-ghost" style="margin-top: 1.5rem; justify-content: center; font-size: 0.88rem;">
+            View All Job Positions <i class="ri-arrow-right-line"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Candidates Table -->
+<div class="glass-panel" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.2rem;">Recent Candidates</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Latest applicant evaluations across all roles</div>
+        </div>
+        <a href="{{ url_for('jobs') }}" class="btn-ghost" style="font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+            Explore Positions
+        </a>
+    </div>
+
+    {% if recent_candidates %}
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Candidate Name</th>
+                    <th>Applied Role</th>
+                    <th>Match Score</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cand in recent_candidates %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-main);">{{ cand.name }}</strong>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">{{ cand.email or 'No email provided' }}</div>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color);">
+                            {{ cand.job_title }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 700; font-size: 0.98rem; 
+                            color: {% if cand.match_score >= 80 %}var(--brand-teal){% elif cand.match_score >= 60 %}#5B6B78{% elif cand.match_score >= 40 %}var(--status-warning){% else %}var(--status-danger){% endif %};">
+                            {{ cand.match_score }}%
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if cand.status == 'Shortlisted' %}badge-high{% elif cand.status == 'Rejected' %}badge-low{% else %}badge-mid{% endif %}">
+                            {{ cand.status }}
+                        </span>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.84rem;">
+                        {{ cand.uploaded_at[:10] }}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('candidate_detail', candidate_id=cand.id) }}" class="btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                            View Profile
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2.5rem 1rem;">
+        <i class="ri-user-search-line" style="font-size: 2.5rem; color: var(--text-faint); margin-bottom: 0.75rem; display: block;"></i>
+        <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.35rem;">No candidates evaluated yet</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Create a job position and upload candidate PDF resumes to view evaluations.</p>
+        <a href="{{ url_for('jobs') }}" class="btn-prime" style="font-size: 0.88rem;"><i class="ri-add-line"></i> Create Job Profile</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Configured Job Positions Table -->
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.2rem;">Configured Job Positions</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Active positions mapped to technical criteria</div>
+        </div>
+        <input type="text" id="tableSearchInput" placeholder="Filter positions..." class="form-control" style="width: 220px; padding: 0.45rem 0.75rem; font-size: 0.84rem;">
+    </div>
+
+    {% if jobs %}
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Role Title</th>
+                    <th>Department</th>
+                    <th>Required Competencies</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-main);">{{ job.title }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: var(--brand-teal-soft); color: var(--brand-teal); border: 1px solid #D5E5E0;">
+                            {{ job.department }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="skill-tags">
+                            {% for skill in job.required_skills.split(',')[:4] %}
+                                {% if skill.strip() %}
+                                    <span class="skill-tag">{{ skill.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if job.required_skills.split(',')|length > 4 %}
+                                <span class="skill-tag" style="color: var(--text-muted);">+{{ job.required_skills.split(',')|length - 4 }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.84rem;">
+                        {{ job.created_at[:10] }}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('candidates', job_id=job.id) }}" class="btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                            <i class="ri-user-search-line"></i> View Candidates
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2.5rem 1rem;">
+        <i class="ri-folder-add-line" style="font-size: 2.5rem; color: var(--text-faint); margin-bottom: 0.75rem; display: block;"></i>
+        <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.35rem;">No Job Positions Created</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Define your first position to begin uploading candidate resumes.</p>
+        <a href="{{ url_for('jobs') }}" class="btn-prime" style="font-size: 0.88rem;"><i class="ri-add-line"></i> Create Job Profile</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.distributionData = {{ score_distribution|tojson|safe }};
+</script>
+{% endblock %}

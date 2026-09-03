@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextHire | AI-Assisted Hiring Intelligence & Resume ATS Insights</title>
+    <meta name="description" content="ContextHire helps hiring teams evaluate and prioritize candidates while helping individuals understand and improve their resume performance.">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- Minimal Enterprise SaaS Styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/ContextHire.png') }}">
+</head>
+<body class="landing-body">
+
+    <!-- Top Navigation -->
+    <header class="ch-navbar">
+        <div class="ch-nav-container">
+            <a href="{{ url_for('index') }}" class="ch-brand">
+                <img src="{{ url_for('static', filename='img/ContextHire.png') }}" alt="ContextHire" class="brand-logo-img">
+            </a>
+
+            <!-- Navigation Links with Enterprise Dropdowns -->
+            <ul class="ch-nav-links">
+                <!-- Product Dropdown -->
+                <li class="ch-nav-item">
+                    <span class="ch-nav-link">
+                        Product <i class="ri-arrow-down-s-line"></i>
+                    </span>
+                    <div class="ch-dropdown-menu">
+                        <a href="{{ url_for('register') }}?type=hiring_team" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-building-4-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>For Hiring Teams</h4>
+                                <p>Candidate screening, resume ranking, and talent telemetry</p>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('ats_checker') }}" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-file-search-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>Resume ATS Checker</h4>
+                                <p>Compatibility scoring, keyword analysis, and actionable fixes</p>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- Solutions Dropdown -->
+                <li class="ch-nav-item">
+                    <span class="ch-nav-link">
+                        Solutions <i class="ri-arrow-down-s-line"></i>
+                    </span>
+                    <div class="ch-dropdown-menu">
+                        <a href="#features" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-user-search-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>Candidate Screening</h4>
+                                <p>Automated semantic profile evaluation against job criteria</p>
+                            </div>
+                        </a>
+                        <a href="#features" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-bar-chart-2-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>Candidate Ranking</h4>
+                                <p>Objective conviction sorting via hybrid TF-IDF + SBERT</p>
+                            </div>
+                        </a>
+                        <a href="#features" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-pie-chart-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>Skill Gap Analysis</h4>
+                                <p>Identify required skills missing from applicant resumes</p>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="ch-nav-item">
+                    <a href="#how-it-works" class="ch-nav-link">How It Works</a>
+                </li>
+
+                <!-- Resources Dropdown -->
+                <li class="ch-nav-item">
+                    <span class="ch-nav-link">
+                        Resources <i class="ri-arrow-down-s-line"></i>
+                    </span>
+                    <div class="ch-dropdown-menu">
+                        <a href="#before-after" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-article-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>Resume Tips</h4>
+                                <p>Quantified bullet point formulas and formatting guidelines</p>
+                            </div>
+                        </a>
+                        <a href="#faq" class="ch-dropdown-card">
+                            <div class="ch-dropdown-icon">
+                                <i class="ri-question-line"></i>
+                            </div>
+                            <div class="ch-dropdown-content">
+                                <h4>FAQ</h4>
+                                <p>Answers regarding ATS scoring, data privacy, and models</p>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Navigation Actions -->
+            <div class="ch-nav-actions">
+                {% if session.get('user_id') %}
+                    {% if session.get('account_type') == 'individual' %}
+                        <a href="{{ url_for('ats_checker') }}" class="ch-btn-cta">
+                            <i class="ri-file-text-line"></i> My ATS Checker
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('dashboard') }}" class="ch-btn-cta">
+                            <i class="ri-dashboard-line"></i> Go to Dashboard
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="ch-btn-login">Log In</a>
+                    <a href="{{ url_for('register') }}" class="ch-btn-cta">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- SECTION 1: HERO -->
+    <section class="ch-hero-section">
+        <div class="ch-hero-grid">
+            <div class="ch-hero-content">
+                <div class="ch-hero-tag">
+                    <i class="ri-shield-check-line"></i> AI-Assisted Hiring Intelligence
+                </div>
+                <h1 class="ch-hero-title">
+                    Better Context for Better Hiring.
+                </h1>
+                <p class="ch-hero-subtitle">
+                    AI-assisted insights for smarter hiring decisions and stronger resumes. ContextHire helps hiring teams evaluate and prioritize candidates while helping individuals understand and improve their resume performance.
+                </p>
+                <div class="ch-hero-actions">
+                    <a href="{{ url_for('register') }}?type=hiring_team" class="ch-btn-cta" style="padding: 0.75rem 1.6rem; font-size: 0.95rem;">
+                        <i class="ri-building-4-line"></i> Explore Hiring Tools
+                    </a>
+                    <a href="{{ url_for('ats_checker') }}" class="ch-btn-outline" style="padding: 0.75rem 1.6rem; font-size: 0.95rem;">
+                        <i class="ri-file-search-line"></i> Check My Resume
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Hero Preview: Clean Product Dashboard Preview Mockup -->
+            <div class="ch-hero-preview">
+                <div class="ch-product-preview-card">
+                    <div class="ch-mockup-header">
+                        <div class="ch-window-dots">
+                            <span class="ch-dot"></span>
+                            <span class="ch-dot"></span>
+                            <span class="ch-dot"></span>
+                        </div>
+                        <div class="ch-mockup-title">Candidate Analysis Overview</div>
+                        <span class="badge badge-high" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">Sample View</span>
+                    </div>
+                    <div class="ch-mockup-body">
+                        <div class="ch-preview-metric-row">
+                            <div>
+                                <div style="font-size: 0.8rem; color: var(--lp-text-secondary); font-weight: 500;">Match Conviction</div>
+                                <div class="ch-preview-score">88<span style="font-size: 1.4rem; color: var(--lp-text-muted); font-weight: 500;">%</span></div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="badge badge-high">High Alignment</span>
+                                <div style="font-size: 0.76rem; color: var(--lp-text-muted); margin-top: 0.25rem;">Role: Senior Full Stack Engineer</div>
+                            </div>
+                        </div>
+
+                        <!-- Candidate Quick Meta -->
+                        <div style="padding: 0.75rem 0.85rem; background: #F8F8F6; border-radius: 6px; margin-bottom: 1rem; font-size: 0.84rem; display: flex; justify-content: space-between;">
+                            <span><strong>Candidate:</strong> Alex Rivera</span>
+                            <span style="color: var(--lp-text-muted);">4+ Years Experience</span>
+                        </div>
+
+                        <!-- Breakdown bars -->
+                        <div class="ch-preview-bars">
+                            <div class="ch-preview-bar-item">
+                                <div class="ch-preview-bar-label">
+                                    <span>Technical Competencies</span>
+                                    <strong style="color: var(--lp-teal-primary);">92%</strong>
+                                </div>
+                                <div class="pill-bar">
+                                    <div class="pill-bar-fill" style="width: 92%;"></div>
+                                </div>
+                            </div>
+                            <div class="ch-preview-bar-item">
+                                <div class="ch-preview-bar-label">
+                                    <span>Semantic Alignment</span>
+                                    <strong style="color: var(--lp-teal-primary);">86%</strong>
+                                </div>
+                                <div class="pill-bar">
+                                    <div class="pill-bar-fill" style="width: 86%;"></div>
+                                </div>
+                            </div>
+                            <div class="ch-preview-bar-item">
+                                <div class="ch-preview-bar-label">
+                                    <span>ATS Format & Readability</span>
+                                    <strong style="color: var(--lp-teal-primary);">95%</strong>
+                                </div>
+                                <div class="pill-bar">
+                                    <div class="pill-bar-fill" style="width: 95%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matched Skills Pills -->
+                        <div style="margin-top: 1.25rem;">
+                            <div style="font-size: 0.75rem; color: var(--lp-text-secondary); margin-bottom: 0.4rem; font-weight: 600; text-transform: uppercase;">
+                                Matched Core Skills:
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">React</span>
+                                <span class="skill-tag">Docker</span>
+                                <span class="skill-tag">PostgreSQL</span>
+                                <span class="skill-tag">AWS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: TRUST / CONTEXT -->
+    <section class="ch-trust-section">
+        <div class="ch-trust-statement">
+            <i class="ri-checkbox-circle-line" style="color: var(--lp-teal-primary); font-size: 1.2rem;"></i>
+            Designed for modern recruitment workflows &bull; Built around the challenges of modern hiring.
+        </div>
+    </section>
+
+    <!-- SECTION 3: TWO USER EXPERIENCES -->
+    <section class="ch-section" id="experiences">
+        <div class="ch-section-header">
+            <span class="ch-section-tag">DUAL CAPABILITY</span>
+            <h2 class="ch-section-title">One Platform. Two Experiences.</h2>
+            <p class="ch-section-desc">
+                Whether you are evaluating a pool of talent or refining your own professional resume, ContextHire provides structured insights tailored to your goals.
+            </p>
+        </div>
+
+        <div class="ch-two-paths-grid">
+            <!-- Card 1: For Hiring Teams -->
+            <div class="ch-path-card">
+                <div>
+                    <div class="ch-path-icon">
+                        <i class="ri-building-4-line"></i>
+                    </div>
+                    <h3 class="ch-path-title">For Hiring Teams</h3>
+                    <p class="ch-path-desc">
+                        Analyze, compare, and prioritize candidates with AI-assisted insights and structured semantic telemetry.
+                    </p>
+                    <ul class="ch-path-features">
+                        <li><i class="ri-check-line"></i> Candidate analysis and layout parsing</li>
+                        <li><i class="ri-check-line"></i> Resume comparison across positions</li>
+                        <li><i class="ri-check-line"></i> Job matching with competency extraction</li>
+                        <li><i class="ri-check-line"></i> Objective candidate ranking</li>
+                        <li><i class="ri-check-line"></i> Skill gap analysis & telemetry reports</li>
+                    </ul>
+                </div>
+                <a href="{{ url_for('register') }}?type=hiring_team" class="ch-btn-cta" style="justify-content: center;">
+                    Explore Hiring Tools <i class="ri-arrow-right-line"></i>
+                </a>
+            </div>
+
+            <!-- Card 2: For Individuals -->
+            <div class="ch-path-card">
+                <div>
+                    <div class="ch-path-icon">
+                        <i class="ri-file-user-line"></i>
+                    </div>
+                    <h3 class="ch-path-title">For Individuals</h3>
+                    <p class="ch-path-desc">
+                        Understand how your resume performs and identify practical, actionable ways to improve it.
+                    </p>
+                    <ul class="ch-path-features">
+                        <li><i class="ri-check-line"></i> ContextHire Resume Compatibility Score</li>
+                        <li><i class="ri-check-line"></i> Formatting and section hierarchy analysis</li>
+                        <li><i class="ri-check-line"></i> Missing keyword identification</li>
+                        <li><i class="ri-check-line"></i> Job description matching and skill alignment</li>
+                        <li><i class="ri-check-line"></i> Practical bullet point improvement suggestions</li>
+                    </ul>
+                </div>
+                <a href="{{ url_for('ats_checker') }}" class="ch-btn-outline" style="justify-content: center;">
+                    Check My Resume <i class="ri-arrow-right-line"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: PROBLEM -->
+    <section class="ch-section" style="background: #ffffff; border-top: 1px solid var(--lp-border); border-bottom: 1px solid var(--lp-border); max-width: 100%;">
+        <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+            <div class="ch-section-header">
+                <span class="ch-section-tag">THE RECRUITMENT CHALLENGE</span>
+                <h2 class="ch-section-title">Hiring and job applications shouldn't rely on guesswork.</h2>
+                <p class="ch-section-desc">
+                    Hiring teams spend hours reviewing resumes, while job seekers often don't know why their applications are rejected.
+                </p>
+            </div>
+
+            <div class="ch-problem-grid">
+                <div class="ch-problem-card">
+                    <div class="ch-problem-icon">
+                        <i class="ri-time-line"></i>
+                    </div>
+                    <h3 class="ch-problem-title">Manual Resume Screening</h3>
+                    <p class="ch-problem-text">
+                        Hiring teams spend significant time manually reviewing large numbers of applications, leading to reviewer fatigue and delayed responses.
+                    </p>
+                </div>
+
+                <div class="ch-problem-card">
+                    <div class="ch-problem-icon">
+                        <i class="ri-scales-line"></i>
+                    </div>
+                    <h3 class="ch-problem-title">Inconsistent Evaluation</h3>
+                    <p class="ch-problem-text">
+                        Different resumes can be evaluated inconsistently across team members without a structured, objective comparison baseline.
+                    </p>
+                </div>
+
+                <div class="ch-problem-card">
+                    <div class="ch-problem-icon">
+                        <i class="ri-eye-off-line"></i>
+                    </div>
+                    <h3 class="ch-problem-title">Missing Relevant Signals</h3>
+                    <p class="ch-problem-text">
+                        Important skills, contextual experience, and candidate strengths can be easily overlooked during fast manual screening.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: HOW CONTEXTHIRE WORKS -->
+    <section class="ch-section" id="how-it-works">
+        <div class="ch-section-header">
+            <span class="ch-section-tag">STRUCTURED WORKFLOW</span>
+            <h2 class="ch-section-title">How ContextHire Works</h2>
+            <p class="ch-section-desc">
+                Clear, transparent processes designed to save hours for recruiters and provide clarity for job seekers.
+            </p>
+        </div>
+
+        <div style="font-size: 0.88rem; font-weight: 700; color: var(--lp-teal-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+            For Hiring Teams:
+        </div>
+        <div class="ch-steps-grid">
+            <div class="ch-step-item">
+                <span class="ch-step-num">01</span>
+                <h3 class="ch-step-title">Create a Job</h3>
+                <p class="ch-step-desc">Define job requirements, experience criteria, and essential technical skills.</p>
+            </div>
+
+            <div class="ch-step-item">
+                <span class="ch-step-num">02</span>
+                <h3 class="ch-step-title">Add Candidates</h3>
+                <p class="ch-step-desc">Upload candidate PDF resumes with automated layout parsing and text extraction.</p>
+            </div>
+
+            <div class="ch-step-item">
+                <span class="ch-step-num">03</span>
+                <h3 class="ch-step-title">Analyze & Compare</h3>
+                <p class="ch-step-desc">Use AI-assisted hybrid NLP to evaluate candidate relevance against specifications.</p>
+            </div>
+
+            <div class="ch-step-item">
+                <span class="ch-step-num">04</span>
+                <h3 class="ch-step-title">Review Insights</h3>
+                <p class="ch-step-desc">Review rankings, skill overlaps, gaps, and insights before making decisions.</p>
+            </div>
+        </div>
+
+        <!-- Secondary Flow for Individuals -->
+        <div style="margin-top: 3rem;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--lp-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                For Individuals:
+            </div>
+            <div class="ch-individual-flow">
+                <div class="ch-flow-step">
+                    <span style="width: 28px; height: 28px; background: var(--lp-teal-soft); color: var(--lp-teal-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">1</span>
+                    Upload Resume
+                </div>
+                <i class="ri-arrow-right-line ch-flow-arrow"></i>
+                <div class="ch-flow-step">
+                    <span style="width: 28px; height: 28px; background: var(--lp-teal-soft); color: var(--lp-teal-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">2</span>
+                    Analyze Resume
+                </div>
+                <i class="ri-arrow-right-line ch-flow-arrow"></i>
+                <div class="ch-flow-step">
+                    <span style="width: 28px; height: 28px; background: var(--lp-teal-soft); color: var(--lp-teal-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">3</span>
+                    Review ATS Score
+                </div>
+                <i class="ri-arrow-right-line ch-flow-arrow"></i>
+                <div class="ch-flow-step">
+                    <span style="width: 28px; height: 28px; background: var(--lp-teal-soft); color: var(--lp-teal-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">4</span>
+                    Improve Resume
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: BEFORE AND AFTER -->
+    <section class="ch-section" id="before-after">
+        <div class="ch-section-header">
+            <span class="ch-section-tag">MEASURABLE TRANSFORMATION</span>
+            <h2 class="ch-section-title">From Resume Review to Actionable Insights.</h2>
+            <p class="ch-section-desc">
+                Transform guesswork into structured clarity with transparent criteria and actionable feedback.
+            </p>
+        </div>
+
+        <div class="ch-before-after-grid">
+            <!-- Left Card: Before -->
+            <div class="ch-ba-card before">
+                <div class="ch-ba-header">
+                    <h3>Before ContextHire</h3>
+                    <span class="badge badge-low"><i class="ri-close-line"></i> Unclear Signals</span>
+                </div>
+                <ul class="ch-ba-list">
+                    <li><i class="ri-close-circle-fill"></i> Missing relevant keywords and industry tools</li>
+                    <li><i class="ri-close-circle-fill"></i> Weak skill alignment with job descriptions</li>
+                    <li><i class="ri-close-circle-fill"></i> Unclear project descriptions lacking metrics</li>
+                    <li><i class="ri-close-circle-fill"></i> Formatting issues causing layout parsing drop-off</li>
+                </ul>
+            </div>
+
+            <!-- Right Card: After -->
+            <div class="ch-ba-card after">
+                <div class="ch-ba-header">
+                    <h3>With ContextHire</h3>
+                    <span class="badge badge-high"><i class="ri-check-line"></i> Structured Insights</span>
+                </div>
+                <ul class="ch-ba-list">
+                    <li><i class="ri-checkbox-circle-fill"></i> Relevant keyword suggestions and gap alerts</li>
+                    <li><i class="ri-checkbox-circle-fill"></i> Clear skill alignment insights against job criteria</li>
+                    <li><i class="ri-checkbox-circle-fill"></i> Clear improvement recommendations for impact</li>
+                    <li><i class="ri-checkbox-circle-fill"></i> Better structured, ATS-compliant resume feedback</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: CORE FEATURES -->
+    <section class="ch-section" id="features">
+        <div class="ch-section-header">
+            <span class="ch-section-tag">COMPREHENSIVE CAPABILITIES</span>
+            <h2 class="ch-section-title">Everything You Need for Better Candidate and Resume Insights.</h2>
+            <p class="ch-section-desc">
+                A unified platform providing deep contextual insights for recruiters and candidates alike.
+            </p>
+        </div>
+
+        <div class="ch-features-grid">
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-file-text-line"></i></div>
+                <h3 class="ch-feature-title">Resume Analysis</h3>
+                <p class="ch-feature-desc">Analyze resume structure, skills, section hierarchy, and relevant candidate information.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-dashboard-3-line"></i></div>
+                <h3 class="ch-feature-title">ATS Score</h3>
+                <p class="ch-feature-desc">Evaluate resume compatibility and practical improvement opportunities objectively.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-crosshair-line"></i></div>
+                <h3 class="ch-feature-title">Job Description Matching</h3>
+                <p class="ch-feature-desc">Compare resume content with specific job requirements and competencies.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-sort-desc"></i></div>
+                <h3 class="ch-feature-title">Candidate Ranking</h3>
+                <p class="ch-feature-desc">Help hiring teams prioritize relevant candidates through weighted hybrid scoring.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-pie-chart-line"></i></div>
+                <h3 class="ch-feature-title">Skill Gap Analysis</h3>
+                <p class="ch-feature-desc">Identify missing or relevant skills required to succeed in target positions.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-git-pull-request-line"></i></div>
+                <h3 class="ch-feature-title">Resume Comparison</h3>
+                <p class="ch-feature-desc">Compare multiple candidates side by side against the same technical position.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-lightbulb-line"></i></div>
+                <h3 class="ch-feature-title">Actionable Suggestions</h3>
+                <p class="ch-feature-desc">Provide clear, structured recommendations instead of only displaying an arbitrary score.</p>
+            </div>
+
+            <div class="ch-feature-card">
+                <div class="ch-feature-icon"><i class="ri-file-chart-line"></i></div>
+                <h3 class="ch-feature-title">Reports and Insights</h3>
+                <p class="ch-feature-desc">Generate structured CSV summaries and talent telemetry reports for review.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 8: PRODUCT PREVIEW -->
+    <section class="ch-section" style="background: #ffffff; border-top: 1px solid var(--lp-border); border-bottom: 1px solid var(--lp-border); max-width: 100%;">
+        <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+            <div class="ch-section-header">
+                <span class="ch-section-tag">PLATFORM PREVIEW</span>
+                <h2 class="ch-section-title">Built for Clearer Hiring Decisions.</h2>
+                <p class="ch-section-desc">
+                    A realistic overview of candidate rankings, match scores, and skill overlap telemetry.
+                </p>
+            </div>
+
+            <div class="ch-preview-showcase">
+                <div class="ch-showcase-header">
+                    <div>
+                        <strong style="font-size: 0.95rem; color: var(--lp-text-primary);">Role: Senior Backend Engineer</strong>
+                        <span style="font-size: 0.8rem; color: var(--lp-text-muted); margin-left: 0.5rem;">&bull; 24 Candidates Ingested</span>
+                    </div>
+                    <span class="badge badge-high"><i class="ri-shield-check-line"></i> Active Pipeline</span>
+                </div>
+                <div class="ch-showcase-body table-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate Name</th>
+                                <th>Match Score</th>
+                                <th>Core Competencies</th>
+                                <th>Conviction Status</th>
+                                <th>Evaluation Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Alex Rivera</strong><div style="font-size: 0.78rem; color: var(--lp-text-muted);">alex@example.com</div></td>
+                                <td><strong style="color: var(--lp-teal-primary); font-size: 1.05rem;">92.4%</strong></td>
+                                <td>
+                                    <div class="skill-tags">
+                                        <span class="skill-tag">Python</span>
+                                        <span class="skill-tag">FastAPI</span>
+                                        <span class="skill-tag">Docker</span>
+                                        <span class="skill-tag">AWS</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-high">Shortlisted</span></td>
+                                <td style="font-size: 0.84rem; color: var(--lp-text-muted);">Today</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sarah Jenkins</strong><div style="font-size: 0.78rem; color: var(--lp-text-muted);">sarah.j@example.com</div></td>
+                                <td><strong style="color: var(--lp-teal-primary); font-size: 1.05rem;">86.1%</strong></td>
+                                <td>
+                                    <div class="skill-tags">
+                                        <span class="skill-tag">Python</span>
+                                        <span class="skill-tag">PostgreSQL</span>
+                                        <span class="skill-tag">Kubernetes</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-high">Shortlisted</span></td>
+                                <td style="font-size: 0.84rem; color: var(--lp-text-muted);">Yesterday</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jordan Lee</strong><div style="font-size: 0.78rem; color: var(--lp-text-muted);">jordan.l@example.com</div></td>
+                                <td><strong style="color: var(--lp-status-warning); font-size: 1.05rem;">68.5%</strong></td>
+                                <td>
+                                    <div class="skill-tags">
+                                        <span class="skill-tag">Node.js</span>
+                                        <span class="skill-tag">Express</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-mid">Under Review</span></td>
+                                <td style="font-size: 0.84rem; color: var(--lp-text-muted);">3 days ago</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 9: RESPONSIBLE AI -->
+    <section class="ch-section">
+        <div class="ch-responsible-ai-card">
+            <div class="ch-rai-icon">
+                <i class="ri-user-star-line"></i>
+            </div>
+            <div class="ch-rai-content">
+                <h3>AI-Assisted. Human Decisions.</h3>
+                <p>
+                    ContextHire provides structured insights and semantic matching to support hiring and resume improvement. Final hiring decisions should always remain with human reviewers.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 10: FAQ -->
+    <section class="ch-section" id="faq">
+        <div class="ch-section-header">
+            <span class="ch-section-tag">TRANSPARENCY</span>
+            <h2 class="ch-section-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="ch-faq-list">
+            <div class="ch-faq-item active">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>What is ContextHire?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    ContextHire is an AI-assisted hiring intelligence platform. It provides hiring teams with candidate screening and ranking tools, while providing individuals with resume compatibility analysis and improvement suggestions.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>How does the ATS resume analysis work?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    The platform parses structured text from resume documents, evaluates formatting consistency, extracts recognized skills, checks for action verbs and quantified impact, and computes a ContextHire Resume Compatibility Score.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>Can individuals use ContextHire?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    Yes. Individuals, job seekers, and students can use the dedicated Resume ATS Checker to review their resume compatibility score, identify missing keywords, and follow practical suggestions to improve their applications.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>Can hiring teams analyze multiple candidates?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    Yes. Hiring teams can configure technical job profiles, upload candidate resumes in bulk, and review prioritized rankings and skill overlaps in an organized dashboard.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>Does ContextHire make hiring decisions automatically?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    No. ContextHire is an AI-assisted decision-support platform. It surfaces insights, rankings, and skill overlaps, but all final hiring and shortlisting decisions are made by human reviewers.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>Can I compare my resume with a job description?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    Yes. When analyzing your resume, you can optionally paste the target job description to receive specific keyword gap alerts and job relevance matching.
+                </div>
+            </div>
+
+            <div class="ch-faq-item">
+                <div class="ch-faq-question" onclick="this.parentElement.classList.toggle('active')">
+                    <span>How is my data handled?</span>
+                    <i class="ri-arrow-down-s-line ch-faq-chevron"></i>
+                </div>
+                <div class="ch-faq-answer">
+                    Resumes are processed securely in temporary storage for analysis and then scrubbed. Your personal data is never sold, shared, or made publicly accessible.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 11: FINAL CTA (Deep Teal) -->
+    <div style="padding: 0 1.5rem;">
+        <div class="ch-cta-section">
+            <h2 class="ch-cta-title">Make Your Next Decision With Better Context.</h2>
+            <p class="ch-cta-desc">
+                Whether you're hiring talent or preparing for your next opportunity, ContextHire helps turn resumes into clearer insights.
+            </p>
+            <div class="ch-cta-buttons">
+                <a href="{{ url_for('register') }}?type=hiring_team" class="ch-btn-white">
+                    Explore Hiring Tools
+                </a>
+                <a href="{{ url_for('ats_checker') }}" class="ch-btn-teal-outline">
+                    Check My Resume
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER (4 Columns on #F3F3F0) -->
+    <footer class="ch-footer">
+        <div class="ch-footer-grid">
+            <div>
+                <a href="{{ url_for('index') }}" class="ch-brand" style="margin-bottom: 0.85rem; display: inline-flex;">
+                    <img src="{{ url_for('static', filename='img/ContextHire.png') }}" alt="ContextHire" class="brand-logo-img">
+                </a>
+                <p style="font-size: 0.88rem; line-height: 1.6; max-width: 300px; color: var(--lp-text-secondary); margin-bottom: 1.25rem;">
+                    AI-assisted candidate intelligence for hiring teams and resume insights for individuals.
+                </p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="https://linkedin.com" target="_blank" rel="noopener" style="color: var(--lp-text-secondary); font-size: 1.2rem;"><i class="ri-linkedin-fill"></i></a>
+                    <a href="https://github.com" target="_blank" rel="noopener" style="color: var(--lp-text-secondary); font-size: 1.2rem;"><i class="ri-github-fill"></i></a>
+                </div>
+            </div>
+
+            <div class="ch-footer-col">
+                <h5>Product</h5>
+                <ul class="ch-footer-links">
+                    <li><a href="{{ url_for('register') }}?type=hiring_team">For Hiring Teams</a></li>
+                    <li><a href="{{ url_for('ats_checker') }}">Resume ATS Checker</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                </ul>
+            </div>
+
+            <div class="ch-footer-col">
+                <h5>Resources</h5>
+                <ul class="ch-footer-links">
+                    <li><a href="#before-after">Resume Tips</a></li>
+                    <li><a href="#how-it-works">Hiring Resources</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#features">Documentation</a></li>
+                </ul>
+            </div>
+
+            <div class="ch-footer-col">
+                <h5>Company</h5>
+                <ul class="ch-footer-links">
+                    <li><a href="#how-it-works">About</a></li>
+                    <li><a href="mailto:support@contexthire.com">Contact</a></li>
+                    <li><a href="#faq">Privacy Policy</a></li>
+                    <li><a href="#faq">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ch-footer-bottom">
+            <div>&copy; 2026 ContextHire. All rights reserved.</div>
+            <div>Built as an AI-assisted hiring intelligence platform.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

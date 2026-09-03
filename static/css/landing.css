@@ -1,0 +1,1012 @@
+/* ==========================================================================
+   ContextHire - Enterprise Minimal SaaS Landing Page Styles
+   Warm Off-White (#F8F8F6), Deep Charcoal (#1C1C1A), Deep Teal (#245C59)
+   ========================================================================== */
+
+:root {
+    --lp-bg: #F8F8F6;
+    --lp-surface: #FFFFFF;
+    --lp-text-primary: #1C1C1A;
+    --lp-text-secondary: #6B6F6A;
+    --lp-text-muted: #8E928B;
+    
+    --lp-teal-primary: #245C59;
+    --lp-teal-hover: #1B4745;
+    --lp-teal-soft: #E7F0ED;
+    --lp-teal-light: #A8C5B8;
+    
+    --lp-border: #E6E5E1;
+    --lp-border-subtle: #F0EFEA;
+    
+    --lp-status-success: #3F7D5A;
+    --lp-status-success-bg: #EDF5F1;
+    --lp-status-danger: #B85450;
+    --lp-status-danger-bg: #FDF1F0;
+    --lp-status-warning: #B7791F;
+    --lp-status-warning-bg: #FFF8E8;
+
+    --lp-radius-sm: 6px;
+    --lp-radius-md: 10px;
+    --lp-radius-lg: 14px;
+    --lp-radius-xl: 20px;
+    
+    --lp-shadow-card: 0 1px 3px rgba(28, 28, 26, 0.04);
+    --lp-shadow-elevated: 0 8px 24px rgba(28, 28, 26, 0.06);
+    --lp-shadow-popover: 0 16px 36px rgba(28, 28, 26, 0.08);
+
+    --lp-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body.landing-body {
+    background-color: var(--lp-bg);
+    color: var(--lp-text-primary);
+    font-family: var(--lp-font);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    overflow-x: hidden;
+    display: block !important;
+}
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+.ch-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(248, 248, 246, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--lp-border);
+    transition: all 0.2s ease;
+}
+
+.ch-nav-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0.95rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ch-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--lp-text-primary);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+}
+
+.brand-logo-img {
+    height: 44px;
+    width: auto;
+    max-width: 190px;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ch-brand-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--lp-teal-primary);
+    border-radius: var(--lp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.15rem;
+}
+
+.ch-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ch-nav-item {
+    position: relative;
+}
+
+.ch-nav-link {
+    color: var(--lp-text-secondary);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: var(--lp-radius-sm);
+    transition: color 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+}
+
+.ch-nav-link:hover, .ch-nav-item:hover > .ch-nav-link {
+    color: var(--lp-text-primary);
+}
+
+/* Dropdown Menu */
+.ch-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: -15px;
+    width: 380px;
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    box-shadow: var(--lp-shadow-popover);
+    padding: 0.85rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1010;
+}
+
+.ch-nav-item:hover .ch-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(2px);
+}
+
+.ch-dropdown-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.75rem;
+    border-radius: var(--lp-radius-sm);
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.ch-dropdown-card:hover {
+    background: var(--lp-bg);
+}
+
+.ch-dropdown-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--lp-teal-soft);
+    color: var(--lp-teal-primary);
+    border-radius: var(--lp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.ch-dropdown-content h4 {
+    margin: 0 0 0.15rem 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--lp-text-primary);
+}
+
+.ch-dropdown-content p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.35;
+}
+
+/* Nav Actions */
+.ch-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.ch-btn-login {
+    color: var(--lp-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: var(--lp-radius-sm);
+    transition: color 0.15s ease;
+}
+
+.ch-btn-login:hover {
+    color: var(--lp-text-primary);
+}
+
+.ch-btn-cta {
+    background: var(--lp-teal-primary);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--lp-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.2s ease;
+    border: 1px solid var(--lp-teal-primary);
+}
+
+.ch-btn-cta:hover {
+    background: var(--lp-teal-hover);
+    border-color: var(--lp-teal-hover);
+    color: #ffffff;
+}
+
+.ch-btn-outline {
+    background: transparent;
+    color: var(--lp-text-primary);
+    border: 1px solid var(--lp-border);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--lp-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.ch-btn-outline:hover {
+    background: #FFFFFF;
+    border-color: #CFCFC8;
+    color: var(--lp-teal-primary);
+}
+
+/* ==========================================================================
+   Section 1: Hero Section
+   ========================================================================== */
+.ch-hero-section {
+    padding: 4.5rem 1.5rem 5rem 1.5rem;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.ch-hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 3.5rem;
+    align-items: center;
+}
+
+.ch-hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: var(--lp-teal-soft);
+    color: var(--lp-teal-primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--lp-radius-sm);
+    margin-bottom: 1.25rem;
+    border: 1px solid #D5E5E0;
+}
+
+.ch-hero-title {
+    font-size: 3.25rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--lp-text-primary);
+    letter-spacing: -0.025em;
+    margin-bottom: 1.25rem;
+}
+
+.ch-hero-subtitle {
+    font-size: 1.12rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-width: 520px;
+}
+
+.ch-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Hero Right: Product Dashboard Preview Mockup */
+.ch-product-preview-card {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    box-shadow: var(--lp-shadow-elevated);
+    overflow: hidden;
+}
+
+.ch-mockup-header {
+    background: #F4F4F2;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--lp-border);
+}
+
+.ch-window-dots {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.ch-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #D1D0CA;
+}
+
+.ch-mockup-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--lp-text-muted);
+}
+
+.ch-mockup-body {
+    padding: 1.5rem;
+}
+
+.ch-preview-metric-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.ch-preview-score {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: var(--lp-teal-primary);
+    line-height: 1;
+}
+
+.ch-preview-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.ch-preview-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ch-preview-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--lp-text-secondary);
+}
+
+/* ==========================================================================
+   Section 2: Trust Statement
+   ========================================================================== */
+.ch-trust-section {
+    border-top: 1px solid var(--lp-border);
+    border-bottom: 1px solid var(--lp-border);
+    background: #ffffff;
+    padding: 2.25rem 1.5rem;
+    text-align: center;
+}
+
+.ch-trust-statement {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--lp-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+/* ==========================================================================
+   Common Section Layout
+   ========================================================================== */
+.ch-section {
+    padding: 5.5rem 1.5rem;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.ch-section-header {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 3.5rem auto;
+}
+
+.ch-section-tag {
+    color: var(--lp-teal-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.65rem;
+}
+
+.ch-section-title {
+    font-size: 2.35rem;
+    font-weight: 700;
+    color: var(--lp-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 0.85rem;
+}
+
+.ch-section-desc {
+    font-size: 1.05rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   Section 3: Two User Experiences
+   ========================================================================== */
+.ch-two-paths-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.ch-path-card {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--lp-shadow-card);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ch-path-card:hover {
+    border-color: var(--lp-teal-light);
+    box-shadow: var(--lp-shadow-elevated);
+}
+
+.ch-path-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--lp-teal-soft);
+    color: var(--lp-teal-primary);
+    border-radius: var(--lp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.ch-path-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--lp-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.ch-path-desc {
+    font-size: 0.95rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.55;
+    margin-bottom: 1.75rem;
+}
+
+.ch-path-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ch-path-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.92rem;
+    color: var(--lp-text-primary);
+}
+
+.ch-path-features li i {
+    color: var(--lp-teal-primary);
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   Section 4: Problem Statement
+   ========================================================================== */
+.ch-problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+}
+
+.ch-problem-card {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    padding: 2rem 1.75rem;
+    box-shadow: var(--lp-shadow-card);
+}
+
+.ch-problem-icon {
+    font-size: 1.6rem;
+    color: var(--lp-status-warning);
+    margin-bottom: 1rem;
+}
+
+.ch-problem-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--lp-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.ch-problem-text {
+    font-size: 0.92rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.55;
+}
+
+/* ==========================================================================
+   Section 5: How ContextHire Works (4-Step Horizontal)
+   ========================================================================== */
+.ch-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.ch-step-item {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    padding: 1.85rem 1.5rem;
+    box-shadow: var(--lp-shadow-card);
+    position: relative;
+}
+
+.ch-step-num {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--lp-teal-primary);
+    background: var(--lp-teal-soft);
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--lp-radius-sm);
+    margin-bottom: 1rem;
+}
+
+.ch-step-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--lp-text-primary);
+    margin-bottom: 0.4rem;
+}
+
+.ch-step-desc {
+    font-size: 0.88rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.5;
+}
+
+/* Secondary Flow for Individuals */
+.ch-individual-flow {
+    margin-top: 2.5rem;
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.ch-flow-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--lp-text-primary);
+}
+
+.ch-flow-arrow {
+    color: var(--lp-text-muted);
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   Section 6: Before & After (Subtle Red vs Soft Teal)
+   ========================================================================== */
+.ch-before-after-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.ch-ba-card {
+    border-radius: var(--lp-radius-md);
+    padding: 2.25rem 2rem;
+}
+
+.ch-ba-card.before {
+    background: var(--lp-status-danger-bg);
+    border: 1px solid #E8C5C2;
+}
+
+.ch-ba-card.after {
+    background: var(--lp-status-success-bg);
+    border: 1px solid #BED7CB;
+}
+
+.ch-ba-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.ch-ba-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--lp-text-primary);
+    margin: 0;
+}
+
+.ch-ba-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ch-ba-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+    color: var(--lp-text-primary);
+}
+
+.ch-ba-list li i {
+    font-size: 1.15rem;
+    margin-top: 0.1rem;
+}
+
+.ch-ba-card.before i { color: var(--lp-status-danger); }
+.ch-ba-card.after i { color: var(--lp-status-success); }
+
+/* ==========================================================================
+   Section 7: Core Features Grid (8 Clean Cards)
+   ========================================================================== */
+.ch-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.ch-feature-card {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    padding: 1.85rem 1.6rem;
+    box-shadow: var(--lp-shadow-card);
+    transition: all 0.2s ease;
+}
+
+.ch-feature-card:hover {
+    box-shadow: var(--lp-shadow-elevated);
+    border-color: #D3D2CC;
+}
+
+.ch-feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--lp-teal-soft);
+    color: var(--lp-teal-primary);
+    border-radius: var(--lp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1.15rem;
+}
+
+.ch-feature-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--lp-text-primary);
+    margin-bottom: 0.35rem;
+}
+
+.ch-feature-desc {
+    font-size: 0.88rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Section 8: Product Preview
+   ========================================================================== */
+.ch-preview-showcase {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-lg);
+    box-shadow: var(--lp-shadow-elevated);
+    overflow: hidden;
+}
+
+.ch-showcase-header {
+    background: #F4F4F2;
+    padding: 1.15rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--lp-border);
+}
+
+.ch-showcase-body {
+    padding: 2rem;
+}
+
+/* ==========================================================================
+   Section 9: Responsible AI
+   ========================================================================== */
+.ch-responsible-ai-card {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-left: 4px solid var(--lp-teal-primary);
+    border-radius: var(--lp-radius-md);
+    padding: 2.25rem 2.5rem;
+    box-shadow: var(--lp-shadow-card);
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.ch-rai-icon {
+    width: 54px;
+    height: 54px;
+    background: var(--lp-teal-soft);
+    color: var(--lp-teal-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.ch-rai-content h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--lp-text-primary);
+    margin-bottom: 0.4rem;
+}
+
+.ch-rai-content p {
+    font-size: 0.95rem;
+    color: var(--lp-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================================================
+   Section 10: FAQ Accordion
+   ========================================================================== */
+.ch-faq-list {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.ch-faq-item {
+    background: #ffffff;
+    border: 1px solid var(--lp-border);
+    border-radius: var(--lp-radius-md);
+    box-shadow: var(--lp-shadow-card);
+    overflow: hidden;
+}
+
+.ch-faq-question {
+    padding: 1.25rem 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--lp-text-primary);
+}
+
+.ch-faq-chevron {
+    font-size: 1.2rem;
+    color: var(--lp-teal-primary);
+    transition: transform 0.2s ease;
+}
+
+.ch-faq-item.active .ch-faq-chevron {
+    transform: rotate(180deg);
+}
+
+.ch-faq-answer {
+    padding: 0 1.6rem 1.4rem 1.6rem;
+    color: var(--lp-text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    display: none;
+    border-top: 1px solid var(--lp-border-subtle);
+    padding-top: 1rem;
+}
+
+.ch-faq-item.active .ch-faq-answer {
+    display: block;
+}
+
+/* ==========================================================================
+   Section 11: Final CTA (Deep Teal)
+   ========================================================================== */
+.ch-cta-section {
+    background: var(--lp-teal-primary);
+    color: #ffffff;
+    border-radius: var(--lp-radius-lg);
+    padding: 4.5rem 2.5rem;
+    text-align: center;
+    margin: 0 auto 5rem auto;
+    max-width: 1140px;
+}
+
+.ch-cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+.ch-cta-desc {
+    font-size: 1.1rem;
+    color: #D1E3DF;
+    max-width: 600px;
+    margin: 0 auto 2.25rem auto;
+    line-height: 1.6;
+}
+
+.ch-cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.ch-btn-white {
+    background: #ffffff;
+    color: var(--lp-teal-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: var(--lp-radius-sm);
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.ch-btn-white:hover {
+    background: #F4F4F2;
+}
+
+.ch-btn-teal-outline {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: var(--lp-radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ch-btn-teal-outline:hover {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Footer (4-Column Layout on #F3F3F0)
+   ========================================================================== */
+.ch-footer {
+    background: #F3F3F0;
+    border-top: 1px solid var(--lp-border);
+    padding: 4.5rem 1.5rem 2.5rem 1.5rem;
+    color: var(--lp-text-secondary);
+}
+
+.ch-footer-grid {
+    max-width: 1240px;
+    margin: 0 auto 3rem auto;
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    gap: 3rem;
+}
+
+.ch-footer-col h5 {
+    color: var(--lp-text-primary);
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ch-footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.ch-footer-links a {
+    color: var(--lp-text-secondary);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: color 0.15s ease;
+}
+
+.ch-footer-links a:hover {
+    color: var(--lp-teal-primary);
+}
+
+.ch-footer-bottom {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid var(--lp-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    color: var(--lp-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .ch-hero-grid { grid-template-columns: 1fr; }
+    .ch-two-paths-grid { grid-template-columns: 1fr; }
+    .ch-before-after-grid { grid-template-columns: 1fr; }
+    .ch-steps-grid { grid-template-columns: 1fr 1fr; }
+    .ch-problem-grid { grid-template-columns: 1fr; }
+    .ch-footer-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+    .ch-steps-grid { grid-template-columns: 1fr; }
+    .ch-hero-title { font-size: 2.35rem; }
+    .ch-individual-flow { flex-direction: column; align-items: flex-start; }
+    .ch-responsible-ai-card { flex-direction: column; }
+    .ch-footer-grid { grid-template-columns: 1fr; }
+}

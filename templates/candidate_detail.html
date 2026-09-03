@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | {{ candidate.name }} - Dossier{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('candidates', job_id=candidate.job_id) }}" style="color: var(--brand-teal); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem;">
+            <i class="ri-arrow-left-line"></i> Back to Applicant Roster
+        </a>
+        <h1 class="page-title">{{ candidate.name }}</h1>
+        <p class="page-subtitle">Candidate dossier evaluated for <strong style="color: var(--text-main);">{{ candidate.job_title }}</strong></p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <span class="badge {% if candidate.status == 'Shortlisted' %}badge-high{% elif candidate.status == 'Rejected' %}badge-low{% else %}badge-mid{% endif %}" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+            Status: {{ candidate.status }}
+        </span>
+        <a href="{{ url_for('update_status', candidate_id=candidate.id, new_status='Shortlisted') }}" class="btn-prime">
+            <i class="ri-check-line"></i> Shortlist
+        </a>
+        <a href="{{ url_for('update_status', candidate_id=candidate.id, new_status='Rejected') }}" class="btn-ghost" style="color: var(--status-danger);">
+            <i class="ri-close-line"></i> Reject
+        </a>
+    </div>
+</div>
+
+<!-- Candidate Overview Bento -->
+<div class="bento-grid">
+    <!-- Score Panel -->
+    <div class="glass-panel" style="grid-column: span 4; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <span class="stat-label">Hybrid Match Score (HMS)</span>
+            <div style="font-family: var(--font-heading); font-size: 3.5rem; font-weight: 800; color: var(--brand-teal); margin: 0.5rem 0;">
+                {{ candidate.match_score }}%
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">
+                Calculated via 25% Lexical TF-IDF + 35% Sentence Transformers + 40% Direct Skill Intersections.
+            </p>
+        </div>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">
+                <i class="ri-mail-line"></i> {{ candidate.email or 'Email not identified' }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                <i class="ri-phone-line"></i> {{ candidate.phone or 'Phone not identified' }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Radar Chart -->
+    <div class="glass-panel" style="grid-column: span 8;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem;">
+            Match Vector Dimensional Breakdown
+        </h2>
+        <div style="height: 220px; position: relative;">
+            <canvas id="candidateScoreRadar"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Skills Gap Analysis -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Matched Skills -->
+    <div class="glass-panel">
+        <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--status-success); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="ri-checkbox-circle-line"></i> Matched Competencies ({{ matched_skills|length }})
+        </h3>
+        {% if matched_skills %}
+        <div class="skill-tags">
+            {% for skill in matched_skills %}
+                <span class="skill-tag" style="background: var(--status-success-bg); color: var(--status-success); border-color: #BED7CB; font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                    <i class="ri-check-line"></i> {{ skill }}
+                </span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted); font-size: 0.88rem;">No required skills directly intersected with resume tokens.</p>
+        {% endif %}
+    </div>
+
+    <!-- Missing Skills / Skill Gaps -->
+    <div class="glass-panel">
+        <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--status-danger); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="ri-error-warning-line"></i> Skill Gaps Detected ({{ missing_skills|length }})
+        </h3>
+        {% if missing_skills %}
+        <div class="skill-tags">
+            {% for skill in missing_skills %}
+                <span class="skill-tag" style="background: var(--status-danger-bg); color: var(--status-danger); border-color: #E8C5C2; font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                    <i class="ri-close-line"></i> {{ skill }}
+                </span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--status-success); font-size: 0.88rem;">
+            <i class="ri-sparkling-fill"></i> Perfect target skill coverage! Zero missing competencies detected.
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Extracted Raw Resume Text -->
+<div class="glass-panel">
+    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="ri-file-text-line" style="color: var(--brand-teal);"></i> Extracted Resume Layout Text
+    </h3>
+    <pre style="background: #F8F8F6; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; font-family: monospace; font-size: 0.85rem; color: var(--text-main); white-space: pre-wrap; max-height: 400px; overflow-y: auto; line-height: 1.6;">{{ candidate.raw_text }}</pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Compute or approximate breakdown dimensions for radar view
+    const overallScore = {{ candidate.match_score }};
+    const matchedCount = {{ matched_skills|length }};
+    const missingCount = {{ missing_skills|length }};
+    const totalSkills = matchedCount + missingCount;
+    const skillScore = totalSkills > 0 ? (matchedCount / totalSkills) * 100 : 100;
+    
+    window.candidateBreakdown = {
+        lexical: Math.min(100, Math.round(overallScore * 0.9)),
+        semantic: Math.min(100, Math.round(overallScore * 1.05)),
+        skills: Math.round(skillScore)
+    };
+</script>
+{% endblock %}

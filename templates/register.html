@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | Create Your Account{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <a href="{{ url_for('index') }}" style="display: inline-block; margin-bottom: 0.85rem;">
+                <img src="{{ url_for('static', filename='img/ContextHire.png') }}" alt="ContextHire" style="height: 52px; width: auto; object-fit: contain;">
+            </a>
+            <h1 style="font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main);">
+                How would you like to use ContextHire?
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 0.35rem;">
+                Choose the experience that best fits your needs.
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+            <!-- Role Selection Cards -->
+            <input type="hidden" name="account_type" id="accountTypeInput" value="hiring_team">
+
+            <div class="role-selection-grid">
+                <!-- Option 1: Hiring Team -->
+                <div class="role-card selected" id="cardHiringTeam" onclick="selectRole('hiring_team')">
+                    <div class="role-card-icon">
+                        <i class="ri-building-4-line"></i>
+                    </div>
+                    <div class="role-card-title">Hiring Team</div>
+                    <div class="role-card-desc">
+                        For companies, HR professionals, recruiters, and hiring managers.
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--brand-teal); font-weight: 600;">
+                        <i class="ri-check-line"></i> Full candidate dashboard & ranking
+                    </div>
+                </div>
+
+                <!-- Option 2: Individual -->
+                <div class="role-card" id="cardIndividual" onclick="selectRole('individual')">
+                    <div class="role-card-icon">
+                        <i class="ri-user-smile-line"></i>
+                    </div>
+                    <div class="role-card-title">Individual</div>
+                    <div class="role-card-desc">
+                        For students, job seekers, and career professionals.
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--brand-teal); font-weight: 600;">
+                        <i class="ri-check-line"></i> ATS resume score & suggestions
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="username">Full Name</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Jane Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="name@domain.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-prime" id="submitBtn" style="width: 100%; justify-content: center; margin-top: 0.5rem; padding: 0.85rem; font-size: 0.95rem;">
+                Continue as Hiring Team
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.75rem; font-size: 0.88rem; color: var(--text-muted);">
+            Already have an account? 
+            <a href="{{ url_for('login') }}" style="color: var(--brand-teal); text-decoration: none; font-weight: 600;">Sign in</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectRole(type) {
+        document.getElementById('accountTypeInput').value = type;
+        const cardHiring = document.getElementById('cardHiringTeam');
+        const cardInd = document.getElementById('cardIndividual');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (type === 'hiring_team') {
+            cardHiring.classList.add('selected');
+            cardInd.classList.remove('selected');
+            submitBtn.innerText = "Continue as Hiring Team";
+        } else {
+            cardInd.classList.add('selected');
+            cardHiring.classList.remove('selected');
+            submitBtn.innerText = "Continue as Individual";
+        }
+    }
+
+    // Auto-select based on query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('type') === 'individual') {
+        selectRole('individual');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ContextHire | AI-Assisted Hiring Intelligence{% endblock %}</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/ContextHire.png') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if session.get('user_id') %}
+    <aside class="app-sidebar">
+        <div>
+            {% if session.get('account_type') == 'individual' %}
+            <a href="{{ url_for('ats_checker') }}" class="brand-wrapper">
+                <img src="{{ url_for('static', filename='img/ContextHire.png') }}" alt="ContextHire" class="brand-logo-img">
+            </a>
+            {% else %}
+            <a href="{{ url_for('dashboard') }}" class="brand-wrapper">
+                <img src="{{ url_for('static', filename='img/ContextHire.png') }}" alt="ContextHire" class="brand-logo-img">
+            </a>
+            {% endif %}
+
+            <nav>
+                <ul class="nav-menu">
+                    {% if session.get('account_type') == 'individual' %}
+                    <li class="nav-menu-item {% if request.endpoint == 'ats_checker' %}active{% endif %}">
+                        <a href="{{ url_for('ats_checker') }}">
+                            <i class="ri-file-search-line"></i> Resume ATS Checker
+                        </a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="{{ url_for('index') }}#how-it-works">
+                            <i class="ri-information-line"></i> How It Works
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="ri-dashboard-line"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-menu-item {% if request.endpoint == 'jobs' %}active{% endif %}">
+                        <a href="{{ url_for('jobs') }}">
+                            <i class="ri-briefcase-4-line"></i> Job Positions
+                        </a>
+                    </li>
+                    <li class="nav-menu-item {% if request.endpoint == 'ats_checker' %}active{% endif %}">
+                        <a href="{{ url_for('ats_checker') }}">
+                            <i class="ri-file-search-line"></i> Resume Auditor
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-meta">
+                <div class="user-avatar">{{ session.get('username', 'U')[:1].upper() }}</div>
+                <div>
+                    <div class="user-name">{{ session.get('username', 'User') }}</div>
+                    <div class="user-role">
+                        {% if session.get('account_type') == 'individual' %}
+                            Individual Candidate
+                        {% else %}
+                            Hiring Team / Recruiter
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout" title="Sign Out">
+                <i class="ri-logout-box-r-line"></i>
+            </a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <main class="{% if not session.get('user_id') and (request.endpoint in ['login', 'register']) %}auth-main{% else %}app-main{% endif %}">
+        
+        <!-- Universal Navigation Toolbar: Back button, Home icon, Direct Login link -->
+        <nav class="universal-top-nav" aria-label="Universal Navigation">
+            <div class="top-nav-left">
+                <button type="button" class="top-nav-btn" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ url_for('index') }}'; }" title="Go back">
+                    <i class="ri-arrow-left-line"></i>
+                    <span>Back</span>
+                </button>
+                <a href="{{ url_for('index') }}" class="top-nav-btn top-nav-home" title="Go to Home Page">
+                    <i class="ri-home-4-line"></i>
+                    <span>Home</span>
+                </a>
+            </div>
+
+            <div class="top-nav-right">
+                {% if not session.get('user_id') %}
+                    {% if request.endpoint == 'login' %}
+                    <a href="{{ url_for('register') }}" class="top-nav-btn top-nav-login" title="Create New Account">
+                        <i class="ri-user-add-line"></i>
+                        <span>Create Account</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="top-nav-btn top-nav-login" title="Direct to Login Page">
+                        <i class="ri-login-box-line"></i>
+                        <span>Sign In</span>
+                    </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="top-nav-btn top-nav-login" title="Direct to Login Page">
+                        <i class="ri-login-box-line"></i>
+                        <span>Sign In</span>
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-alert flash-{{ category }}">
+                            <span>{{ message }}</span>
+                            <i class="ri-close-line" onclick="this.parentElement.remove()" style="cursor: pointer;"></i>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

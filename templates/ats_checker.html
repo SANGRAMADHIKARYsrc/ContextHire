@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}ContextHire | Resume ATS Compatibility Checker{% endblock %}
+
+{% block content %}
+<div style="max-width: 1080px; margin: 0 auto;">
+    
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: 2.25rem;">
+        <div>
+            <h1 class="page-title">Understand Your Resume Better</h1>
+            <p class="page-subtitle">
+                Upload your resume and receive an objective ATS compatibility score with practical, actionable suggestions.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('ats_checker') }}?sample=1" class="btn-ghost" style="font-size: 0.88rem;">
+                <i class="ri-play-circle-line"></i> Load Sample Evaluation
+            </a>
+        </div>
+    </div>
+
+    <!-- Upload & Job Description Form -->
+    <div class="glass-panel" style="margin-bottom: 2.5rem; padding: 2.25rem;">
+        <form method="POST" action="{{ url_for('ats_checker') }}" enctype="multipart/form-data">
+            
+            <!-- Large Clean Drag-and-Drop Zone -->
+            <div style="background: #FAFAF8; border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 3rem 2rem; text-align: center; margin-bottom: 1.75rem; cursor: pointer; transition: all 0.2s ease;" id="atsDropArea" onclick="document.getElementById('atsResumeInput').click()">
+                <input type="file" name="resume" id="atsResumeInput" accept=".pdf" style="display: none;">
+                
+                <div style="width: 52px; height: 52px; background: var(--brand-teal-soft); color: var(--brand-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1rem auto;">
+                    <i class="ri-file-upload-line" id="atsDropIcon"></i>
+                </div>
+
+                <div style="font-size: 1.15rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.35rem;" id="atsDropText">
+                    Drop your resume here
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                    PDF documents supported up to 10MB &bull; 100% encrypted and private
+                </div>
+
+                <button type="button" class="btn-ghost" style="background: #FFFFFF; font-size: 0.88rem;">
+                    <i class="ri-folder-open-line"></i> Choose Resume File
+                </button>
+            </div>
+
+            <!-- Optional: Job Description Field -->
+            <div class="form-group" style="margin-bottom: 1.75rem;">
+                <label class="form-label" for="job_description" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Target Job Description <span style="font-weight: 400; color: var(--text-muted); font-size: 0.82rem;">(Optional)</span></span>
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">Paste to check keyword gaps & job alignment</span>
+                </label>
+                <textarea name="job_description" id="job_description" class="form-control" rows="3" placeholder="Paste the job description or required skills to calculate targeted job match percentage...">{{ job_desc or '' }}</textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn-prime" style="padding: 0.75rem 2rem; font-size: 0.95rem;">
+                    <i class="ri-search-eye-line"></i> Analyze Resume
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ATS RESULTS PRESENTATION -->
+    {% if analysis %}
+    <div style="margin-top: 2rem;">
+        
+        <!-- Top Score Summary Banner -->
+        <div class="glass-panel" style="margin-bottom: 2rem; padding: 2.25rem;">
+            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 2.5rem; align-items: center;">
+                
+                <!-- Circular Score Gauge -->
+                <div style="text-align: center; padding: 1.5rem; background: #F8F8F6; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem;">
+                        ContextHire Score
+                    </div>
+
+                    <!-- Score Dial -->
+                    <div style="font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 0.35rem; 
+                        color: {% if analysis.score >= 80 %}#245C59{% elif analysis.score >= 60 %}#5B6B78{% elif analysis.score >= 40 %}#B7791F{% else %}#B85450{% endif %};">
+                        {{ analysis.score|int }}<span style="font-size: 1.5rem; color: var(--text-muted); font-weight: 500;">/100</span>
+                    </div>
+
+                    <!-- Category Pill -->
+                    <div>
+                        <span class="badge" style="font-size: 0.84rem; padding: 0.3rem 0.8rem;
+                            {% if analysis.score >= 80 %}background: var(--status-success-bg); color: var(--status-success); border: 1px solid #BED7CB;
+                            {% elif analysis.score >= 60 %}background: #F1F4F6; color: #475569; border: 1px solid #CBD5E1;
+                            {% elif analysis.score >= 40 %}background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid #EEDBBE;
+                            {% else %}background: var(--status-danger-bg); color: var(--status-danger); border: 1px solid #E8C5C2;{% endif %}">
+                            {{ analysis.category }}
+                        </span>
+                    </div>
+
+                    <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.75rem;">
+                        {{ analysis.word_count }} words parsed
+                    </div>
+                </div>
+
+                <!-- Score Context & Criteria Progress Stack -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+                        <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 0;">
+                            ContextHire Resume Compatibility Score
+                        </h2>
+                        {% if candidate_name %}
+                        <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500;">Candidate: <strong>{{ candidate_name }}</strong></span>
+                        {% endif %}
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Estimated compatibility based on formatting integrity, keyword density, section hierarchy, and measurable action verbs.
+                    </p>
+
+                    <!-- Breakdown Bars -->
+                    <div style="display: flex; flex-direction: column; gap: 0.95rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.3rem;">
+                                <span style="color: var(--text-secondary); font-weight: 500;">Formatting & Layout</span>
+                                <strong style="color: var(--text-main);">{{ analysis.formatting_score }}%</strong>
+                            </div>
+                            <div class="pill-bar">
+                                <div class="pill-bar-fill" style="width: {{ analysis.formatting_score }}%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.3rem;">
+                                <span style="color: var(--text-secondary); font-weight: 500;">Recognized Competencies & Skills</span>
+                                <strong style="color: var(--text-main);">{{ analysis.skills_score }}%</strong>
+                            </div>
+                            <div class="pill-bar">
+                                <div class="pill-bar-fill" style="width: {{ analysis.skills_score }}%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.3rem;">
+                                <span style="color: var(--text-secondary); font-weight: 500;">Action Verbs & Readability</span>
+                                <strong style="color: var(--text-main);">{{ analysis.readability_score }}%</strong>
+                            </div>
+                            <div class="pill-bar">
+                                <div class="pill-bar-fill" style="width: {{ analysis.readability_score }}%;"></div>
+                            </div>
+                        </div>
+
+                        {% if analysis.job_match %}
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 0.3rem;">
+                                <span style="color: var(--brand-teal); font-weight: 600;">Job Description Alignment</span>
+                                <strong style="color: var(--brand-teal);">{{ analysis.job_match }}%</strong>
+                            </div>
+                            <div class="pill-bar">
+                                <div class="pill-bar-fill" style="width: {{ analysis.job_match }}%; background: var(--brand-teal);"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strengths vs Improvement Opportunities (Side-by-side) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Strengths Card -->
+            <div class="glass-panel" style="border-left: 4px solid var(--status-success);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+                    <i class="ri-checkbox-circle-line" style="color: var(--status-success); font-size: 1.3rem;"></i>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Identified Strengths</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+                    {% for strength in analysis.strengths %}
+                    <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.88rem; color: var(--text-main);">
+                        <i class="ri-check-line" style="color: var(--status-success); font-size: 1rem; margin-top: 0.1rem;"></i>
+                        <span>{{ strength }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Improvement Opportunities Card -->
+            <div class="glass-panel" style="border-left: 4px solid var(--status-warning);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+                    <i class="ri-lightbulb-line" style="color: var(--status-warning); font-size: 1.3rem;"></i>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Improvement Opportunities</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+                    {% for opp in analysis.opportunities %}
+                    <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.88rem; color: var(--text-main);">
+                        <i class="ri-arrow-right-s-line" style="color: var(--status-warning); font-size: 1rem; margin-top: 0.1rem;"></i>
+                        <span>{{ opp }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Skills Found & Missing Keywords Section -->
+        <div class="glass-panel">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-main);">
+                        Extracted Skills ({{ analysis.extracted_skills|length }})
+                    </h3>
+                    <div class="skill-tags">
+                        {% for skill in analysis.extracted_skills %}
+                        <span class="skill-tag" style="background: var(--brand-teal-soft); border-color: #D5E5E0; color: var(--brand-teal); font-weight: 500;">
+                            {{ skill }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-main);">
+                        Suggested Keywords & Competencies
+                    </h3>
+                    <div class="skill-tags">
+                        {% for kw in analysis.missing_keywords %}
+                        <span class="skill-tag" style="background: #FFF8E8; border-color: #EEDBBE; color: #B7791F; font-weight: 500;">
+                            + {{ kw }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    const fileInput = document.getElementById('atsResumeInput');
+    const dropText = document.getElementById('atsDropText');
+    const dropIcon = document.getElementById('atsDropIcon');
+    const dropArea = document.getElementById('atsDropArea');
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            dropText.innerHTML = `<span style="color: var(--brand-teal);">Selected: ${fileInput.files[0].name}</span>`;
+            dropIcon.className = "ri-checkbox-circle-fill";
+            dropArea.style.borderColor = "var(--brand-teal)";
+            dropArea.style.background = "var(--brand-teal-soft)";
+        }
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = "var(--brand-teal)";
+            dropArea.style.background = "var(--brand-teal-soft)";
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = "var(--border-color)";
+            dropArea.style.background = "#FAFAF8";
+        }, false);
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0 && files[0].type.includes('pdf')) {
+            fileInput.files = files;
+            dropText.innerHTML = `<span style="color: var(--brand-teal);">Selected: ${files[0].name}</span>`;
+            dropIcon.className = "ri-checkbox-circle-fill";
+            dropArea.style.borderColor = "var(--brand-teal)";
+            dropArea.style.background = "var(--brand-teal-soft)";
+        }
+    });
+</script>
+{% endblock %}
