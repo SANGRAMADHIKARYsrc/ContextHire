@@ -2,7 +2,7 @@ services:
   - type: web
     name: contexthire
     env: python
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    buildCommand: "sh build.sh"
     startCommand: "gunicorn app:app"
     envVars:
       - key: SECRET_KEY
