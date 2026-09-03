@@ -40,16 +40,22 @@ def init_db():
     schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
     
     conn = get_db_connection()
-    if not os.path.exists(db_path) and os.path.exists(schema_path):
+    cursor = conn.cursor()
+    
+    # Check if tables exist in database
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+    table_exists = cursor.fetchone()
+    
+    if not table_exists and os.path.exists(schema_path):
         with open(schema_path, 'r', encoding='utf-8') as f:
             conn.executescript(f.read())
-        print("ContextHire SQLite database initialized.")
+        conn.commit()
+        print("ContextHire SQLite database initialized from schema.sql.")
         
     # Safe migration: ensure account_type exists in users
-    cursor = conn.cursor()
     cursor.execute("PRAGMA table_info(users)")
     cols = [col[1] for col in cursor.fetchall()]
-    if 'account_type' not in cols:
+    if cols and 'account_type' not in cols:
         cursor.execute("ALTER TABLE users ADD COLUMN account_type VARCHAR(50) DEFAULT 'hiring_team'")
         conn.commit()
     conn.close()

@@ -16,12 +16,17 @@ try:
 except Exception as e:
     print(f"Notice: Running with high-performance Lexical fallback ({e})")
 
-# Download NLTK stopwords safely
+# Download NLTK stopwords safely to private path
+nltk_dir = os.path.expanduser('~/nltk_data')
+os.makedirs(nltk_dir, exist_ok=True)
+if nltk_dir not in nltk.data.path:
+    nltk.data.path.insert(0, nltk_dir)
+
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     try:
-        nltk.download('stopwords', quiet=True)
+        nltk.download('stopwords', download_dir=nltk_dir, quiet=True)
     except Exception:
         pass
 
