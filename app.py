@@ -156,6 +156,9 @@ def ats_checker():
                 
                 if os.path.exists(file_path):
                     os.remove(file_path)
+                    
+                if len(raw_text.strip()) < 20:
+                    flash(f"Warning: No readable text detected in '{filename}'. PDF appears to be a scanned image or flattened graphic. ATS algorithms require selectable text.", "warning")
             else:
                 flash("Please upload a standard PDF resume document.", "danger")
         else:
@@ -328,7 +331,10 @@ def candidates(job_id):
             if os.path.exists(file_path):
                 os.remove(file_path)
                 
-            flash(f"Resume for '{candidate_name}' evaluated. Hybrid Match Score: {matching['score']}%", "success")
+            if len(raw_text.strip()) < 20:
+                flash(f"Warning: No readable text detected in '{filename}'. PDF appears to be a scanned image or flattened graphic without selectable text. Real ATS engines require text-based PDFs (e.g., Export from Word/Google Docs). Match score is 0%.", "warning")
+            else:
+                flash(f"Resume for '{candidate_name}' evaluated. Hybrid Match Score: {matching['score']}%", "success")
             return redirect(url_for('candidates', job_id=job_id))
         else:
             flash("Invalid file format. Please upload standard PDF documents.", "danger")

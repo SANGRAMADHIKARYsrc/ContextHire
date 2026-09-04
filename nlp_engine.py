@@ -66,17 +66,43 @@ SKILLS_DB_SORTED = sorted(SKILLS_DB, key=len, reverse=True)
 
 def extract_text_from_pdf(pdf_path):
     """
-    Extracts structured text from a resume PDF using pdfplumber layout engine.
+    Extracts structured text from a resume PDF using multi-tier fallback:
+    1. pdfplumber layout engine
+    2. pdfplumber raw text stream
+    3. pypdf extraction
     """
     extracted_text = ""
+    # Tier 1: pdfplumber layout engine
     try:
         with pdfplumber.open(pdf_path) as pdf:
             for page in pdf.pages:
-                text = page.extract_text(layout=True)
+                text = None
+                try:
+                    text = page.extract_text(layout=True)
+                except Exception:
+                    pass
+                if not text or not text.strip():
+                    try:
+                        text = page.extract_text()
+                    except Exception:
+                        pass
                 if text:
                     extracted_text += text + "\n"
     except Exception as e:
-        print(f"Error reading PDF: {e}")
+        print(f"pdfplumber extraction notice: {e}")
+
+    # Tier 2: pypdf fallback if empty
+    if not extracted_text.strip():
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(pdf_path)
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    extracted_text += text + "\n"
+        except Exception as e:
+            print(f"pypdf extraction notice: {e}")
+
     return extracted_text.strip()
 
 def clean_text(text):

@@ -1,5 +1,11 @@
 # ContextHire: Context-Aware Candidate Screening & ATS Resume Compatibility Engine
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://contexthire.onrender.com)
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Framework-Flask%203.0-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+
+**Live Application URL**: [https://contexthire.onrender.com](https://contexthire.onrender.com)
+
 ContextHire is a full-stack recruitment intelligence and resume analysis platform built with Python (Flask), SQLite, and Natural Language Processing. The project addresses the limitations of traditional Applicant Tracking Systems (ATS) that rely solely on rigid keyword matching, often rejecting qualified candidates due to vocabulary mismatches or synonyms.
 
 The system implements a **Hybrid Match Scoring (HMS)** algorithm combining lexical matching (TF-IDF), dense vector semantic embeddings (Sentence-BERT), and direct technical competency entity extraction. It caters to two distinct user journeys:
